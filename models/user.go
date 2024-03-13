@@ -13,7 +13,7 @@ type User struct {
 
 func makeUser(id uint, email, passwd string) (*User, error) {
 
-	if len([]byte(passwd)) > 70 {
+	if len([]byte(passwd)) > 72 {
 		return nil, fmt.Errorf("password is too long! Cannot create user")
 	}
 	user := &User{
@@ -21,6 +21,8 @@ func makeUser(id uint, email, passwd string) (*User, error) {
 		Email:    email,
 		Password: passwd,
 	}
+
+	user.HashPassword()
 
 	return user, nil
 }
