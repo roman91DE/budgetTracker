@@ -3,32 +3,45 @@ package models
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+	"regexp"
 )
 
 type User struct {
-	ID       uint   `json:"id" gorm:"primary_key"`
+	gorm.Model
 	Email    string `json:"email" gorm:"type:varchar(100);unique_index"`
 	Password string `json:"password"`
 }
 
-func makeUser(id uint, email, passwd string) (*User, error) {
+// MakeUser validates arguments, hashes the password and returns a User struct
+func MakeUser(email, passwd string) (*User, error) {
 
 	if len([]byte(passwd)) > 72 {
 		return nil, fmt.Errorf("password is too long! Cannot create user")
 	}
+
+	if len(passwd) < 8 {
+		return nil, fmt.Errorf("password is too short! Cannot create user")
+	}
+
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+
+	if !emailRegex.MatchString(email) {
+		return nil, fmt.Errorf("invalid email format! Cannot create user")
+	}
+
 	user := &User{
-		ID:       id,
 		Email:    email,
 		Password: passwd,
 	}
 
-	user.HashPassword()
+	user.hashPassword()
 
 	return user, nil
 }
 
 // HashPassword generates a hashed password from a plaintext string
-func (u *User) HashPassword() error {
+func (u *User) hashPassword() error {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
 	if err != nil {
 		return err
@@ -38,7 +51,7 @@ func (u *User) HashPassword() error {
 }
 
 // CheckPassword compares a plaintext password with the user's hashed password
-func (u *User) CheckPassword(password string) bool {
+func (u *User) checkPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil
 }
