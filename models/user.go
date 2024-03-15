@@ -35,7 +35,9 @@ func MakeUser(email, passwd string) (*User, error) {
 		Password: passwd,
 	}
 
-	user.hashPassword()
+	if err := user.hashPassword(); err != nil {
+		return nil, fmt.Errorf("error occured during hashing! Cannot create user: %v", err)
+	}
 
 	return user, nil
 }
@@ -54,4 +56,10 @@ func (u *User) hashPassword() error {
 func (u *User) checkPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil
+}
+
+
+type RegisterRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

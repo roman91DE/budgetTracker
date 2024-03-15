@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"github.com/roman91DE/budgetTracker/models"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCreateAndDeleteUser(t *testing.T) {
+func TestUserCRUD(t *testing.T) {
 
 	// Create a temporary directory for the test database.
 	tempDir, err := os.MkdirTemp("", "testdb")
@@ -40,6 +40,14 @@ func TestCreateAndDeleteUser(t *testing.T) {
 	if count != 1 {
 		t.Errorf("Expected 1 user, found %d", count)
 	}
+	// verify we get the correct list of user emails
+	emails, err := GetUserbase((db))
+	if err != nil {
+		t.Errorf("Failed to retrieve userbase: %v", err)
+	}
+	if len(emails) != 1 || emails[0] != "test@example.com" {
+		t.Errorf("Returned invalid List of user emails: %v", emails)
+	}
 
 	// Verify email must be unique
 	err = CreateUserInDB(user, db)
@@ -61,6 +69,16 @@ func TestCreateAndDeleteUser(t *testing.T) {
 	if count != 0 {
 		t.Errorf("Expected 0 users, found %d", count)
 	}
+
+	// verify we get the correct list of user emails
+	emails, err = GetUserbase((db))
+	if err != nil {
+		t.Errorf("Failed to retrieve userbase: %v", err)
+	}
+	if len(emails) != 0 {
+		t.Errorf("Returned invalid List of user emails: %v", emails)
+	}
+
 	// we should still be unable to recreate a user because of gorms soft delete feature
 	err = CreateUserInDB(user, db)
 	if err == nil {

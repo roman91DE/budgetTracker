@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"fmt"
@@ -15,6 +15,14 @@ func CreateUserInDB(user *models.User, db *gorm.DB) error {
 	return nil // Return nil if user creation is successful
 }
 
+func GetUserbase(db *gorm.DB) ([]string, error) {
+	var emails []string
+	if err := db.Model(&models.User{}).Pluck("Email", &emails).Error; err != nil {
+		return nil, fmt.Errorf("couldnt pluck <Email> from database: %v", err)
+	}
+	return emails, nil
+}
+
 func DeleteUserInDB(userEmail string, db *gorm.DB) (bool, error) {
 	// Assuming you have a User struct where the Email field is tagged appropriately for GORM
 	result := db.Where("email = ?", userEmail).Delete(&models.User{})
@@ -26,9 +34,6 @@ func DeleteUserInDB(userEmail string, db *gorm.DB) (bool, error) {
 
 	// Check if any rows were deleted
 	if result.RowsAffected == 0 {
-		// You can choose to return false with no error if no user was found,
-		// indicating the operation was "successful" but had no effect.
-		// Alternatively, return an error if you need to treat this case as exceptional.
 		return false, fmt.Errorf("no user found with email %s", userEmail)
 	}
 
