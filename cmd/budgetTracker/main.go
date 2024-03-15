@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net/http"
 	"github.com/gin-gonic/gin"
-	"github.com/roman91DE/budgetTracker/models"
 	"github.com/roman91DE/budgetTracker/database"
+	"github.com/roman91DE/budgetTracker/models"
+	"net/http"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 
 	r.POST("/register", func(c *gin.Context) {
 		var req models.RegisterRequest
-	
+
 		// Parse JSON body
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -36,21 +36,19 @@ func main() {
 			return
 		}
 
-	
 		user, err := models.MakeUser(req.Email, req.Password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err = database.CreateUserInDB(user, db); err != nil{
+		if err = database.CreateUserInDB(user, db); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Something went wrong"})
 			return
 		}
-	
+
 		c.JSON(http.StatusOK, gin.H{"Registered new User": user.Email})
 	})
-	
 
 	r.GET("/users", func(c *gin.Context) {
 
@@ -63,10 +61,6 @@ func main() {
 		// If successful, respond with the list of emails
 		c.JSON(http.StatusOK, gin.H{"emails": emails})
 	})
-
-
-
-
 
 	r.Run() // By default, it listens on port 8080
 }

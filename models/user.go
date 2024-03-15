@@ -58,7 +58,6 @@ func (u *User) checkPassword(password string) bool {
 	return err == nil
 }
 
-
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
