@@ -52,14 +52,13 @@ func EmailExists(email string, db *gorm.DB) bool {
 
 // Fetch the hashed Password for a given Email
 func GetHashedPassword(email string, db *gorm.DB) (bool, []byte) {
-    var user models.User
-    if err := db.Where("email = ?", email).First(&user).Error; err != nil {
-        if err == gorm.ErrRecordNotFound {
-            return false, nil // Record not found, return false and nil slice
-        }
-        return false, nil // Other error occurred, return false and nil slice
-    }
-    // No error occurred, return true and hashed password
-    return true, []byte(user.Password)
+	var user models.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil // Record not found, return false and nil slice
+		}
+		return false, nil // Other error occurred, return false and nil slice
+	}
+	// No error occurred, return true and hashed password
+	return true, []byte(user.Password)
 }
-

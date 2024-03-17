@@ -44,7 +44,7 @@ func MakeUser(email, passwd string) (*User, error) {
 
 // HashPassword generates a hashed password from a plaintext string
 func (u *User) hashPassword() error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
